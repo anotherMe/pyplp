@@ -14,16 +14,13 @@ import pdb
 import locale
 locale.setlocale(locale.LC_TIME, LOCALE)
 
-class ParseException(Exception):
-	pass
-
 
 def parse_postfix_smtpd_disconnect(line):
 	"""	Oct  5 12:18:08 vrtmail03 postfix/smtpd[3289]: disconnect from int-appmi01.gas.it[192.168.2.223] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
 	"""
 	
 	line = parsers.Line(line)
-	r = alchemy.Connect()
+	r = alchemy.Disconnect()
 	
 	timestamp = line.cutAt(15)
 	date_object = datetime.strptime(timestamp, DATE_FORMAT)
