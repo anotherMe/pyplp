@@ -6,14 +6,14 @@ import os
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Text, Boolean
 
 Base = declarative_base()
 
-class Temp(Base):
-	__tablename__ = 'temporary'
+class Bulk(Base):
+	__tablename__ = 'bulk'
 	
-	"""	Temporary table used to make aggregation analysis on log data.
+	"""	Table used to put all lines
 	"""
 	
 	id = Column(Integer, primary_key=True)
@@ -21,38 +21,14 @@ class Temp(Base):
 	host = Column(String(250))
 	process_name = Column(String(50))
 	process_id = Column(Integer)
-	smtp_id = Column(String(20))
-	message = Column(Text())
-
-class Disconnect(Base):
-	__tablename__ = 'disconnect'
-
-	id = Column(Integer, primary_key=True)
-	timestamp = Column(DateTime(timezone=False))
-	host = Column(String(250))
-	process_name = Column(String(50))
-	process_id = Column(Integer)
-	connect_from = Column(String(100))
-	connect_from_IP = Column(String(50))
+	smtp_id = Column(String(10))
+	#~ connect = Column(Boolean())
 	stuff = Column(Text())
 	
-class Connect(Base):
-	__tablename__ = 'connect'
-
-	id = Column(Integer, primary_key=True)
-	timestamp = Column(DateTime(timezone=False))
-	host = Column(String(250))
-	process_name = Column(String(50))
-	process_id = Column(Integer)
-	connect_from = Column(String(100))
-	connect_from_IP = Column(String(50))
-	stuff = Column(Text())
-		
-
-class Removed(Base):
-	__tablename__ = 'removed'
+class Dump(Base):
+	__tablename__ = 'dump'
 	
-	"""	postfix/qmgr process removed records
+	"""	Table used to put all lines we can't / wan't to parse
 	"""
 	
 	id = Column(Integer, primary_key=True)
@@ -60,47 +36,105 @@ class Removed(Base):
 	host = Column(String(250))
 	process_name = Column(String(50))
 	process_id = Column(Integer)
-	smtp_id = Column(String(250))
+	#~ code = Column(String(50))
 	stuff = Column(Text())
-	
 
-class Qmgr(Base):
-	__tablename__ = 'qmgr'
-	
-	"""	postfix/qmgr process records
-	"""
-	
-	id = Column(Integer, primary_key=True)
-	timestamp = Column(DateTime(timezone=False))
-	host = Column(String(250))
-	process_name = Column(String(250))
-	process_id = Column(Integer)
-	smtp_id = Column(String(250))
-	message = Column(String(250))
-	message_long = Column(String(250))
-	mail_from = Column(String(250))
-	size = Column(Integer)
-	nrcpt = Column(Integer)
-	queue = Column(String(250))
 
-class Smtpd(Base):
-	__tablename__ = 'smtpd'
-	
-	"""	postfix/smtpd process records
-	"""
-	
-	id = Column(Integer, primary_key=True)
-	timestamp = Column(DateTime(timezone=False))
-	host = Column(String(250))
-	process_name = Column(String(250))
-	process_id = Column(Integer)
-	smtp_id = Column(String(250))
-	message = Column(String(250))
-	message_long = Column(String(250))
-	mail_from = Column(String(250))
-	size = Column(Integer)
-	nrcpt = Column(Integer)
-	queue = Column(String(250))
+#~ class Bounced(Base):
+	#~ __tablename__ = 'bounced'
+	#~ 
+	#~ id = Column(Integer, primary_key=True)
+	#~ timestamp = Column(DateTime(timezone=False))
+	#~ host = Column(String(250))
+	#~ process_name = Column(String(50))
+	#~ process_id = Column(Integer)
+	#~ smtp_id = Column(String(250))
+	#~ mail_to = Column(String(250))
+	#~ relay = Column(String(250))
+	#~ conn_use = Column(Integer)
+	#~ delay = Column(String(250))
+	#~ delays = Column(String(250))
+	#~ dsn = Column(String(250))
+	#~ stuff = Column(Text())
+		#~ 
+#~ 
+#~ class Disconnect(Base):
+	#~ __tablename__ = 'disconnect'
+#~ 
+	#~ id = Column(Integer, primary_key=True)
+	#~ timestamp = Column(DateTime(timezone=False))
+	#~ host = Column(String(250))
+	#~ process_name = Column(String(50))
+	#~ process_id = Column(Integer)
+	#~ connect_from = Column(String(100))
+	#~ connect_from_IP = Column(String(50))
+	#~ stuff = Column(Text())
+	#~ 
+#~ class Connect(Base):
+	#~ __tablename__ = 'connect'
+#~ 
+	#~ id = Column(Integer, primary_key=True)
+	#~ timestamp = Column(DateTime(timezone=False))
+	#~ host = Column(String(250))
+	#~ process_name = Column(String(50))
+	#~ process_id = Column(Integer)
+	#~ connect_from = Column(String(100))
+	#~ connect_from_IP = Column(String(50))
+	#~ stuff = Column(Text())
+		#~ 
+#~ 
+#~ class Removed(Base):
+	#~ __tablename__ = 'removed'
+	#~ 
+	#~ """	postfix/qmgr process removed records
+	#~ """
+	#~ 
+	#~ id = Column(Integer, primary_key=True)
+	#~ timestamp = Column(DateTime(timezone=False))
+	#~ host = Column(String(250))
+	#~ process_name = Column(String(50))
+	#~ process_id = Column(Integer)
+	#~ smtp_id = Column(String(250))
+	#~ stuff = Column(Text())
+	#~ 
+#~ 
+#~ class Qmgr(Base):
+	#~ __tablename__ = 'qmgr'
+	#~ 
+	#~ """	postfix/qmgr process records
+	#~ """
+	#~ 
+	#~ id = Column(Integer, primary_key=True)
+	#~ timestamp = Column(DateTime(timezone=False))
+	#~ host = Column(String(250))
+	#~ process_name = Column(String(250))
+	#~ process_id = Column(Integer)
+	#~ smtp_id = Column(String(250))
+	#~ message = Column(String(250))
+	#~ message_long = Column(String(250))
+	#~ mail_from = Column(String(250))
+	#~ size = Column(Integer)
+	#~ nrcpt = Column(Integer)
+	#~ queue = Column(String(250))
+#~ 
+#~ class Smtpd(Base):
+	#~ __tablename__ = 'smtpd'
+	#~ 
+	#~ """	postfix/smtpd process records
+	#~ """
+	#~ 
+	#~ id = Column(Integer, primary_key=True)
+	#~ timestamp = Column(DateTime(timezone=False))
+	#~ host = Column(String(250))
+	#~ process_name = Column(String(250))
+	#~ process_id = Column(Integer)
+	#~ smtp_id = Column(String(250))
+	#~ message = Column(String(250))
+	#~ message_long = Column(String(250))
+	#~ mail_from = Column(String(250))
+	#~ size = Column(Integer)
+	#~ nrcpt = Column(Integer)
+	#~ queue = Column(String(250))
 
 
 engine = create_engine('sqlite:///' + DB_FILE_NAME)

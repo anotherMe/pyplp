@@ -29,6 +29,16 @@ class Line:
 		
 		return self.line
 
+	def remove(self, string):
+		"""Remove give string checking for existence
+		"""
+		val = self.line[:len(string)]
+		if val != string:
+			raise CutException("No match for given string")
+		
+		self.line = self.line[len(string):]
+		
+
 	def removeFirst(self, num):
 		"""Remove first <num> characters
 
@@ -41,7 +51,7 @@ class Line:
 		self.line = self.line[num:]
 	
 	
-	def cutAt(self, position):
+	def cutAtPos(self, position):
 		"""Cut line at given position
 
 			Arguments:
@@ -55,7 +65,7 @@ class Line:
 		return val
 		
 		
-	def cutAtFirst(self, character):
+	def cutAt(self, character):
 		"""Cut line at first occurrence of character
 
 			Arguments:
