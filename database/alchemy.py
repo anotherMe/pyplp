@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-DB_FILE_NAME = 'sqlalchemy_example.db'
+DB_FILE_NAME = 'pyplp.db'
 
 import os
 from sqlalchemy.ext.declarative import declarative_base
@@ -25,39 +25,47 @@ class Bulk(Base):
 	#~ connect = Column(Boolean())
 	stuff = Column(Text())
 	
-class Dump(Base):
-	__tablename__ = 'dump'
-	
-	"""	Table used to put all lines we can't / wan't to parse
-	"""
-	
-	id = Column(Integer, primary_key=True)
-	timestamp = Column(DateTime(timezone=False))
-	host = Column(String(250))
-	process_name = Column(String(50))
-	process_id = Column(Integer)
-	#~ code = Column(String(50))
-	stuff = Column(Text())
-
-
-#~ class Bounced(Base):
-	#~ __tablename__ = 'bounced'
+#~ class Dump(Base):
+	#~ __tablename__ = 'dump'
+	#~ 
+	#~ """	Table used to put all lines we can't / wan't to parse
+	#~ """
 	#~ 
 	#~ id = Column(Integer, primary_key=True)
 	#~ timestamp = Column(DateTime(timezone=False))
 	#~ host = Column(String(250))
 	#~ process_name = Column(String(50))
 	#~ process_id = Column(Integer)
-	#~ smtp_id = Column(String(250))
-	#~ mail_to = Column(String(250))
-	#~ relay = Column(String(250))
-	#~ conn_use = Column(Integer)
-	#~ delay = Column(String(250))
-	#~ delays = Column(String(250))
-	#~ dsn = Column(String(250))
+	#~ code = Column(String(50))
 	#~ stuff = Column(Text())
-		#~ 
-#~ 
+
+
+class BounceType(Base):
+	__tablename__ = 'DICT_bouncetype'
+	
+	id = Column(Integer, primary_key=True)
+	descr = Column(String(50))
+
+class Bounced(Base):
+	__tablename__ = 'bounced'
+	
+	id = Column(Integer, primary_key=True)
+	
+	#~ timestamp = Column(DateTime(timezone=False))
+	#~ host = Column(String(250))
+	#~ process_name = Column(String(50))
+	#~ process_id = Column(Integer)
+	
+	smtp_id = Column(String(250))
+	mail_to = Column(String(250))
+	relay = Column(String(250))
+	conn_use = Column(Integer)
+	delay = Column(String(250))
+	delays = Column(String(250))
+	dsn = Column(String(250))
+	bounce_type = Column(Integer, ForeignKey('DICT_bouncetype.id'), nullable=False)
+			
+
 #~ class Disconnect(Base):
 	#~ __tablename__ = 'disconnect'
 #~ 
@@ -148,4 +156,11 @@ if __name__ == "__main__":
 		os.remove(DB_FILE_NAME)
 
 	Base.metadata.create_all(engine)
+	session = DBSession()
+	t = BounceType(descr='bounced')
+	session.add(t)
+	t = BounceType(descr='deferred')
+	session.add(t)
+	session.commit()
+	
 

@@ -2,10 +2,11 @@
 
 import pdb
 
+
 class CutException(Exception):
 	pass
 
-
+	
 class Line:
 	
 	def __init__ (self, line):
@@ -30,8 +31,10 @@ class Line:
 		return self.line
 
 	def remove(self, string):
-		"""Remove give string checking for existence
+		"""	Remove given string checking for existence
+			Raises CutException if given string was not found
 		"""
+		
 		val = self.line[:len(string)]
 		if val != string:
 			raise CutException("No match for given string")
@@ -40,7 +43,7 @@ class Line:
 		
 
 	def removeFirst(self, num):
-		"""Remove first <num> characters
+		"""	Remove first <num> characters
 
 			Arguments:
 			num -- number of characters to remove
@@ -72,6 +75,8 @@ class Line:
 			character -- search stops at first occurrence
 			
 			Returns string before given character position
+			
+			Raises CutException if given character was not found
 		"""	
 		
 		if self.line.find(character) < 0:
