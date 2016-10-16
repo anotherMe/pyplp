@@ -19,7 +19,7 @@ class DbLoader:
 	def __init__(self):
 		pass
 	
-	def parse_postfix_smtpd_disconnect(self, line):
+	def postfix_smtpd_disconnect(self, line):
 		"""	Oct  5 12:18:08 vrtmail03 postfix/smtpd[3289]: disconnect from int-appmi01.gas.it[192.168.2.223] ehlo=1 mail=1 rcpt=0/1 quit=1 commands=3/4
 		"""
 		
@@ -41,7 +41,7 @@ class DbLoader:
 		return r
 		
 		
-	def parse_postfix_smtpd_connect(self, line):
+	def postfix_smtpd_connect(self, line):
 		"""	Oct  5 12:17:48 vrtmail03 postfix/smtpd[3289]: connect from int-appmi01.gas.it[192.168.2.223]
 		"""
 		
@@ -63,7 +63,7 @@ class DbLoader:
 		return r
 		
 
-	def parse_postfix_qmgr(self, line):
+	def postfix_qmgr(self, line):
 		"""Example:
 			Oct  5 14:20:33 mail03 postfix/qmgr[1279]: F19B6205D2: from=<turk@gas.it>, size=624, nrcpt=1 (queue active)
 			Oct  7 16:12:37 mail03 postfix/qmgr[1439]: warning: backward time jump detected -- slewing clock
@@ -101,7 +101,7 @@ class DbLoader:
 		return q
 			
 
-	def parse_postfix_qmgr_removed(self, line):
+	def postfix_qmgr_removed(self, line):
 		"""	Example:
 			
 			Oct  7 16:12:37 mail03 postfix/qmgr[1439]: F19B6205D2: removed
@@ -123,7 +123,7 @@ class DbLoader:
 
 		return r
 
-	def parse_bounced(self, line):
+	def bounced(self, line):
 		"""	Example:
 			Oct  7 15:51:37 mail03 postfix/smtp[2876]: A63C2228B8: to=<paolonews@katamail.com>, relay=cmgw-km-2.mail.tiscali.it[213.205.35.84]:25, delay=0.66, delays=0.41/0.01/0.08/0.16, dsn=5.1.1, status=bounced (host cmgw-km-2.mail.tiscali.it[213.205.35.84] said: 550 5.1.1 <paolonews@katamail.com> recipient does not exist (in reply to RCPT TO command))
 			Oct  7 15:51:41 mail03 postfix/smtp[2876]: 3EED5228B9: to=<biancogi10@gbianco.191.it>, relay=none, delay=0.55, delays=0.55/0/0.01/0, dsn=5.4.4, status=bounced (Host or domain name not found. Name service error for name=gbianco.191.it type=AAAA: Host not found)
@@ -158,7 +158,7 @@ class DbLoader:
 		r.stuff = line.get()
 		return r
 		
-	def parse2bulk(self, line):
+	def to_bulk(self, line):
 		
 		line = parsers.Line(line)
 		r = alchemy.Bulk()
@@ -180,7 +180,7 @@ class DbLoader:
 		r.stuff = line.get()
 		return r
 			
-	def parse_dump(self, line):
+	def dump(self, line):
 		
 		line = parsers.Line(line)
 		r = alchemy.Dump()
@@ -213,32 +213,32 @@ if __name__ == "__main__":
 			try:
 				
 				if loop_count == LOG_EVERY_N: 
-					print ("Line {0} - commit in progress ...".format(line_count))
+					print ("Reached line {0} - commit in progress ...".format(line_count))
 					session.commit()
 					loop_count = 0
 					break # FIXME: only for debug
 				
-				t = dl.parse2bulk(line)
+				t = dl.to_bulk(line)
 				session.add(t)
 				
 				
 				#~ if line.find('postfix/qmgr') > -1:
 					#~ 
 						#~ if line.find('removed') > -1:
-							#~ t = dl.parse_postfix_qmgr_removed(line)
+							#~ t = dl.postfix_qmgr_removed(line)
 							#~ session.add(t)
 						#~ else:
-							#~ t = dl.parse_postfix_qmgr(line)
+							#~ t = dl.postfix_qmgr(line)
 							#~ session.add(t)
 				#~ 
 				#~ if line.find('postfix/smtpd') > -1:
 								#~ 
 						#~ if line.find(': connect from') > -1:
-							#~ t = dl.parse_postfix_smtpd_connect(line)
+							#~ t = dl.postfix_smtpd_connect(line)
 							#~ session.add(t)
 							#~ 
 						#~ elif line.find(": disconnect from") > -1:
-								#~ t = parse_postfix_smtpd_disconnect(line)
+								#~ t = postfix_smtpd_disconnect(line)
 								#~ session.add(t)
 						#~ else:
 							#~ pass
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 			except Exception as e:
 				
 				print ("ERROR while parsing line {0}:".format(line_count))
-				t = dl.parse_dump(line)
+				t = dl.dump(line)
 				session.add(t)
 				
 			
