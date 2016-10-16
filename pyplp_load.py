@@ -4,7 +4,7 @@ LOG_FILE_NAME = 'mail.log'
 YEAR = 2016 # log date format does not include year ?
 LOCALE = "en_US.utf8" # NOTE: locale possibly have to be installed
 DATE_FORMAT = '%b  %d %H:%M:%S'
-LOG_EVERY_N = 20000
+LINE_BUFFER = 20000
 
 from database import alchemy
 import parsers
@@ -13,6 +13,15 @@ from datetime import datetime
 import locale
 locale.setlocale(locale.LC_TIME, LOCALE)
 
+class DbInterrogator:
+	
+	def __init__(self):
+		pass
+		
+	def get_bounced(self):
+		pass
+		
+		
 
 class DbLoader:
 	
@@ -158,7 +167,7 @@ class DbLoader:
 		r.stuff = line.get()
 		return r
 		
-	def to_bulk(self, line):
+	def bulk_insert(self, line):
 		
 		line = parsers.Line(line)
 		r = alchemy.Bulk()
@@ -171,7 +180,7 @@ class DbLoader:
 		r.process_name = line.cutAt('[')
 		r.process_id = line.cutAt(']')
 		line.remove(": ")
-		if line.get()[10] == ':':
+		if line.get()[10] == ':' and line.get()[:10] != "statistics":
 			r.smtp_id = line.cutAt(':')
 		#~ elif line.get()[:7] == 'connect':
 			#~ r.connect = True
@@ -198,7 +207,6 @@ class DbLoader:
 		return r
 
 
-
 if __name__ == "__main__":
 	
 	line_count = 1
@@ -212,36 +220,14 @@ if __name__ == "__main__":
 			
 			try:
 				
-				if loop_count == LOG_EVERY_N: 
+				if loop_count == LINE_BUFFER: 
 					print ("Reached line {0} - commit in progress ...".format(line_count))
 					session.commit()
 					loop_count = 0
 					break # FIXME: only for debug
 				
-				t = dl.to_bulk(line)
+				t = dl.bulk_insert(line)
 				session.add(t)
-				
-				
-				#~ if line.find('postfix/qmgr') > -1:
-					#~ 
-						#~ if line.find('removed') > -1:
-							#~ t = dl.postfix_qmgr_removed(line)
-							#~ session.add(t)
-						#~ else:
-							#~ t = dl.postfix_qmgr(line)
-							#~ session.add(t)
-				#~ 
-				#~ if line.find('postfix/smtpd') > -1:
-								#~ 
-						#~ if line.find(': connect from') > -1:
-							#~ t = dl.postfix_smtpd_connect(line)
-							#~ session.add(t)
-							#~ 
-						#~ elif line.find(": disconnect from") > -1:
-								#~ t = postfix_smtpd_disconnect(line)
-								#~ session.add(t)
-						#~ else:
-							#~ pass
 			
 			except Exception as e:
 				
