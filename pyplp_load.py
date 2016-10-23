@@ -9,7 +9,9 @@ from database import alchemy
 import parsers
 from datetime import datetime
 import argparse
+import gzip
 import pdb
+
 
 import locale
 locale.setlocale(locale.LC_TIME, LOCALE)
@@ -25,30 +27,47 @@ class DbLoader:
 		self.filename = filename
 
 
+	def open_file(self, filename):
+		"""	Check if file is gzipped.
+		
+			Returns an io.TextIOWrapper instance
+		"""
+		
+		try:
+			with gzip.open(filename) as f:
+				f.read()
+
+		except OSError:
+			return open(filename)
+			
+		return gzip.open(filename, 'rt')
+
+
 	def run(self):
 		
 		line_count = 1
 		loop_count = 1
-		with open(self.filename, 'r') as f:
+		f = self.open_file(self.filename)
+		for line in f:
+			
+			if loop_count == LINE_BUFFER:
+				
+				print ('Reached line {0} - commit in progress ...'.format(line_count))
+				self.session.commit()
+				loop_count = 0
+			
+			try:
+				dl.insert(line)
 
-			for line in f:
-				
-				if loop_count == LINE_BUFFER:
-					
-					print ('Reached line {0} - commit in progress ...'.format(line_count))
-					self.session.commit()
-					loop_count = 0
-				
-				try:
-					dl.insert(line)
+			except:
+				print('Error while parsing line {0}'.format(line_count))
+				print(line)
+				raise
+			
+			line_count += 1
+			loop_count += 1
 
-				except:
-					print('Error while parsing line {0}'.format(line_count))
-					print(line)
-					raise
-				
-				line_count += 1
-				loop_count += 1
+		f.close()
 				
 	
 	#~ def postfix_smtpd_disconnect(self, line):
@@ -156,7 +175,7 @@ class DbLoader:
 		#~ return r
 
 
-	def bounced(self, smtp_id, status, line):
+	def bounced(self, timestamp, smtp_id, status, line):
 		'''	Parse bounced or deferred
 			
 			Example:
@@ -167,6 +186,8 @@ class DbLoader:
 		r = alchemy.Bounced()
 		
 		r.smtp_id = smtp_id
+		r.timestamp = timestamp
+		
 		line.remove(' to=<')
 		r.mail_to = line.cutAt('>')
 		line.remove(', relay=')
@@ -225,10 +246,10 @@ class DbLoader:
 		r.stuff = tmpval
 		
 		if tmpval.find('status=bounced') > -1:
-			b = self.bounced(smtp_id, 1, line)
+			b = self.bounced(date_object, smtp_id, 1, line)
 			
 		elif tmpval.find('status=deferred') > -1:
-			self.bounced(smtp_id, 2, line)
+			self.bounced(date_object, smtp_id, 2, line)
 		
 		self.session.add(r)
 

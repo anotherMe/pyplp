@@ -50,12 +50,7 @@ class Bounced(Base):
 	__tablename__ = 'bounced'
 	
 	id = Column(Integer, primary_key=True)
-	
-	#~ timestamp = Column(DateTime(timezone=False))
-	#~ host = Column(String(250))
-	#~ process_name = Column(String(50))
-	#~ process_id = Column(Integer)
-	
+	timestamp = Column(DateTime(timezone=False))
 	smtp_id = Column(String(250))
 	mail_to = Column(String(250))
 	relay = Column(String(250))
@@ -155,6 +150,7 @@ if __name__ == "__main__":
 	if os.path.exists(DB_FILE_NAME):
 		os.remove(DB_FILE_NAME)
 
+	print("Creating schema on db file {0}".format(DB_FILE_NAME))
 	Base.metadata.create_all(engine)
 	session = DBSession()
 	t = BounceType(descr='bounced')
