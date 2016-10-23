@@ -232,6 +232,7 @@ class DbLoader:
 		
 		timestamp = line.cutAtPos(15)
 		date_object = datetime.strptime(timestamp, DATE_FORMAT)
+		date_object = date_object.replace(year=YEAR) # TODO: year substitution should be improved
 		r.timestamp = date_object
 		line.remove(' ')
 		r.host = line.cutAt(' ')
