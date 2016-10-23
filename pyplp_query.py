@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 DB_FILE_NAME = 'pyplp_1.db' # FIXME: only for debug
 

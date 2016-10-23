@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 YEAR = 2016 # log date format does not include year ?
 LOCALE = 'en_US.utf8' # NOTE: locale possibly have to be installed
