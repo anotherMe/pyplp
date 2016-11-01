@@ -62,7 +62,7 @@ class DbLoader:
 			except:
 				print('Error while parsing line {0}'.format(line_count))
 				print(line)
-				raise
+				#~ raise #FIXME: decommented only when in develop
 			
 			line_count += 1
 			loop_count += 1
@@ -190,6 +190,9 @@ class DbLoader:
 		
 		line.remove(' to=<')
 		r.mail_to = line.cutAt('>')
+		if line.get()[:11] == ', orig_to=<':
+			line.remove(', orig_to=<')
+			r.orig_to = line.cutAt('>')
 		line.remove(', relay=')
 		r.relay = line.cutAt(',')
 		if line.get()[:9] == ' conn_use':

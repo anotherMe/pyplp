@@ -6,6 +6,9 @@ __pycache__/
 # SQLite database extensions
 *.db
 
+# Ignore /data dir
+data/
+
 # C extensions
 *.so
 

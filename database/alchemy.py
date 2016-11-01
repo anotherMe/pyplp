@@ -53,6 +53,7 @@ class Bounced(Base):
 	timestamp = Column(DateTime(timezone=False))
 	smtp_id = Column(String(250))
 	mail_to = Column(String(250))
+	orig_to = Column(String(250))
 	relay = Column(String(250))
 	conn_use = Column(Integer)
 	delay = Column(String(250))
